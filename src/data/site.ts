@@ -4,8 +4,7 @@ export const site = {
   initials: "AA",
   roles: ["Embedded Software Engineer", "EV Systems & Firmware Consultant"],
   titleLine: "EV Firmware Developer",
-  subtitle:
-    "TI MCU • STM32 / ESP32 • BMS / VCU / CAN • Vehicle Intelligence & Telematics",
+  subtitle: "TI MCU • Quectel EC200 • CAN / BMS / VCU • Fleet Telematics",
   location: "Noida, Uttar Pradesh, India",
   email: "abhishekagrahari0031@gmail.com",
   phone: "+91 89573 99440",
@@ -13,16 +12,17 @@ export const site = {
   github: "https://github.com/Abhishek-ESE",
   resumeHref: "/Abhishek_Agrahari_Resume.pdf",
   photo: "/profile.jpg",
+  photoCutout: "/profile-cutout.webp",
   availability: "Open to EV / automotive embedded roles & consulting",
 
   heroLead:
-    "I build the firmware that keeps electric vehicles alive on the road — vehicle intelligence modules that talk to the BMS, motor controller and VCU over CAN, stay connected over cellular, and hold up in the field at fleet scale.",
+    "On the IoT team at Vecmocon I build the connected cards that ship inside electric two- and three-wheelers — BMS and fleet-GPS devices on TI MCUs and Quectel EC200 — and I work with the telemetry coming back from 20,000+ devices already on the road.",
 
   metrics: [
-    { value: "1.5+", label: "Years shipping production firmware" },
+    { value: "20K+", label: "Fleet devices analysed" },
     { value: "2K+", label: "Production units validated" },
     { value: "90%", label: "Field issue reduction" },
-    { value: "4", label: "MCU families shipped on" },
+    { value: "1.5+", label: "Years shipping firmware" },
   ],
 } as const;
 
@@ -31,27 +31,31 @@ export type Domain = "EV" | "IoT" | "Medical" | "Industrial" | "RF";
 export const experience = [
   {
     company: "Vecmocon Technologies",
-    role: "Embedded Software Engineer",
+    role: "Embedded Software Engineer — IoT Team",
     period: "May 2026 — Present",
     location: "Noida, India",
     current: true,
-    focus: "EV Vehicle Intelligence",
+    focus: "EV IoT Cards · Fleet Telematics",
     blurb:
-      "Building automotive-grade Vehicle Intelligence Modules — the box that sits between the vehicle and the cloud.",
+      "Building the connected hardware inside electric two- and three-wheelers — multiple IoT cards, each for a different vehicle application, feeding a fleet-scale data platform.",
     points: [
-      "Develop firmware on TI MCUs for Vehicle Intelligence Modules interfacing a vehicle's BMS, motor controller and VCU over CAN.",
-      "Integrate Quectel EC200-series cellular modules for real-time vehicle connectivity and telemetry uplink.",
-      "Treat reliability as a first-class requirement — rigorous testing and debugging built into the development cycle for OEM and fleet-scale field dependability.",
-      "Building working expertise in AIS-140, India's compliance standard for vehicle tracking and telematics devices.",
+      "Develop TI MCU firmware for multiple EV IoT cards — a BMS-integrated card and fleet-management GPS devices — each interfacing the vehicle's BMS, motor controller and VCU over CAN.",
+      "Integrate Quectel EC200-series cellular modules for real-time uplink; stream device telemetry into Battery Buddy and VEC-TR, Vecmocon's in-house server for fleet data storage and analytics.",
+      "Built a BLE mobile app for EV scooter control and a fleet-management user interface that talk directly to the IoT card.",
+      "Analyse fleet telemetry from 20,000+ devices deployed in the market to surface field failure patterns and feed fixes back into firmware.",
+      "Developing application-layer code for the card in MATLAB/Simulink; deepening BMS domain expertise and AIS-140 telematics compliance knowledge.",
     ],
     stack: [
       "TI MCU",
-      "STM32",
-      "ESP32",
+      "Quectel EC200",
       "CAN",
       "BMS",
       "VCU",
-      "Quectel EC200",
+      "BLE",
+      "GPS",
+      "VEC-TR",
+      "Battery Buddy",
+      "MATLAB / Simulink",
       "AIS-140",
     ],
   },
@@ -77,6 +81,7 @@ export const experience = [
       "FreeRTOS",
       "Neoway N58",
       "MQTT",
+      "ThingsBoard",
       "FOTA",
       "Low Power",
     ],
@@ -102,6 +107,67 @@ export const experience = [
 
 export const projects = [
   {
+    id: "ev-iot-cards",
+    title: "EV IoT Cards — BMS & Fleet GPS",
+    tagline: "Vecmocon · TI MCU + Quectel EC200",
+    domain: "EV" as Domain,
+    period: "May 2026 — Present",
+    featured: true,
+    summary:
+      "A family of automotive IoT cards for electric two- and three-wheelers: a BMS-integrated card that reads pack state over CAN, and fleet-management GPS devices — TI MCU firmware, Quectel EC200 cellular, telemetry landing in Vecmocon's VEC-TR and Battery Buddy platforms.",
+    problem:
+      "OEMs and fleet operators need one dependable box per vehicle that talks to the BMS, motor controller and VCU, stays online over cellular, and survives years in the field — with a different feature set for each vehicle programme.",
+    build: [
+      "TI MCU firmware for multiple card variants on a shared driver and CAN layer",
+      "BMS / VCU / motor-controller data acquisition over CAN with fault and state reporting",
+      "Quectel EC200-series cellular integration — network registration, reconnect logic, data uplink",
+      "Telemetry pipeline into VEC-TR (in-house storage and analytics server) and Battery Buddy",
+      "GPS tracking with AIS-140-aligned behaviour for the fleet-management variant",
+    ],
+    impact:
+      "Production hardware shipping inside OEM vehicles, backed by a data pipeline that already spans 20,000+ deployed devices.",
+    stack: ["TI MCU", "Quectel EC200", "CAN", "BMS", "VCU", "GPS", "VEC-TR", "Battery Buddy", "AIS-140"],
+  },
+  {
+    id: "ble-fleet-app",
+    title: "BLE App — EV Scooter Control & Fleet UI",
+    tagline: "Vecmocon · Phone ↔ IoT card over BLE",
+    domain: "EV" as Domain,
+    period: "2026",
+    featured: true,
+    summary:
+      "A BLE mobile application that talks directly to the IoT card for EV scooter control, plus a fleet-management user interface — the operator-facing side of the telematics stack.",
+    problem:
+      "Riders and fleet operators needed direct, low-latency control and visibility of the vehicle without a round-trip through the cloud.",
+    build: [
+      "BLE link between the mobile app and the IoT card with a defined command / response protocol",
+      "Scooter control and status commands with diagnostics readback over BLE",
+      "Fleet-management UI surfacing vehicle state for operators",
+    ],
+    impact:
+      "Direct vehicle control and fleet visibility from a phone, riding on the same card firmware.",
+    stack: ["BLE", "TI MCU", "Mobile App", "Fleet Management", "UI"],
+  },
+  {
+    id: "fleet-data",
+    title: "Fleet Telemetry Analysis — 20K Devices",
+    tagline: "Vecmocon · Field data at scale",
+    domain: "EV" as Domain,
+    period: "2026",
+    featured: false,
+    summary:
+      "Analysis of fleet telemetry from 20,000+ deployed devices stored in VEC-TR and Battery Buddy — turning field data into firmware fixes and reliability insight.",
+    problem:
+      "At 20,000 devices, individual bug reports stop being useful. You need to see patterns across the whole fleet to know what to fix first.",
+    build: [
+      "Queried and analysed device telemetry across the deployed fleet",
+      "Identified recurring field failure patterns and connectivity behaviours",
+      "Fed findings back into firmware priorities and validation test cases",
+    ],
+    impact: "Data-driven reliability — fixes prioritised by what the fleet actually does in the field.",
+    stack: ["Fleet Telemetry", "Data Analysis", "VEC-TR", "Battery Buddy", "MATLAB"],
+  },
+  {
     id: "telematics",
     title: "Vehicle Telematics Device",
     tagline: "STM32 + GSM + CAN to Cloud",
@@ -119,7 +185,7 @@ export const projects = [
       "FOTA over HTTP with image validation before handoff to the application",
     ],
     impact:
-      "Remote diagnostics and remote firmware upgrade on one device — the same BMS/VCU/CAN plus cellular pattern used in production EV telematics.",
+      "Remote diagnostics and remote firmware upgrade on one device — the same BMS/VCU/CAN plus cellular pattern I now ship at Vecmocon.",
     stack: ["STM32", "CAN", "Neoway N58", "MQTT", "ThingsBoard", "FOTA", "HTTP"],
   },
   {
@@ -128,7 +194,7 @@ export const projects = [
     tagline: "Commercial product, US client",
     domain: "Medical" as Domain,
     period: "Nov 2025 — Mar 2026",
-    featured: true,
+    featured: false,
     summary:
       "STM32F103 firmware driving 4 motors and a multi-sensor feedback loop for a fully automated medication dispenser, with an Android S720 board handling the UI.",
     problem:
@@ -149,7 +215,7 @@ export const projects = [
     tagline: "Wearable motion tracking",
     domain: "IoT" as Domain,
     period: "Jan 2026 — Mar 2026",
-    featured: true,
+    featured: false,
     summary:
       "Owned R&D, schematic design and ESP32-S3 firmware for a wearable that tracks hip and full-body motion in real time and streams it to a companion mobile app over BLE.",
     problem:
@@ -223,129 +289,91 @@ export const projects = [
   },
 ] as const;
 
-export const skillGroups = [
+/**
+ * The firmware stack, bottom to top. Rendered as a layered architecture
+ * diagram — each layer is somewhere I have shipped code, not a keyword list.
+ */
+export const stackLayers = [
   {
-    key: "ev",
-    title: "EV & Automotive",
-    accent: "cyan" as const,
-    caption: "The stack I build on today",
-    items: [
-      "CAN / CAN-FD",
-      "BMS Integration",
-      "VCU Interfacing",
-      "Motor Controller Comms",
-      "Vehicle Intelligence Module",
-      "AIS-140 Compliance",
-      "Telematics & GPS",
-      "FOTA / OTA Update",
-    ],
-  },
-  {
-    key: "mcu",
-    title: "Microcontrollers",
+    id: "cloud",
+    level: 6,
+    title: "Cloud & Fleet Data",
+    caption: "Where the telemetry lands",
     accent: "lime" as const,
-    caption: "Silicon I have shipped on",
-    items: [
-      "TI MCU",
-      "STM32 (F1 / F4)",
-      "ESP32 / ESP32-S3",
-      "ARM Cortex-M",
-      "ATmega328P",
-      "8051",
-    ],
+    items: ["VEC-TR", "Battery Buddy", "ThingsBoard", "MQTT", "Fleet analytics", "MATLAB"],
   },
   {
-    key: "rtos",
-    title: "Languages & RTOS",
+    id: "app",
+    level: 5,
+    title: "Application",
+    caption: "Vehicle logic and the user-facing side",
     accent: "cyan" as const,
-    caption: "How the firmware is written",
-    items: [
-      "C",
-      "C++",
-      "Python",
-      "Assembly",
-      "FreeRTOS",
-      "CMSIS-RTOS",
-      "embOS",
-      "Bare-metal",
-    ],
+    items: ["State machines", "FOTA / OTA", "BLE mobile app", "Fleet UI", "AIS-140", "Simulink"],
   },
   {
-    key: "protocol",
-    title: "Protocols & Connectivity",
+    id: "connectivity",
+    level: 4,
+    title: "Connectivity",
+    caption: "Getting off the vehicle",
+    accent: "cyan" as const,
+    items: ["Quectel EC200", "Neoway N58", "BLE", "GPS / GNSS", "HTTP", "NB-IoT"],
+  },
+  {
+    id: "bus",
+    level: 3,
+    title: "Vehicle Bus",
+    caption: "Talking to the rest of the EV",
     accent: "amber" as const,
-    caption: "How devices talk",
-    items: [
-      "UART",
-      "SPI",
-      "I2C",
-      "CAN",
-      "BLE",
-      "MQTT",
-      "HTTP",
-      "NB-IoT",
-      "Quectel EC200",
-      "Neoway N58",
-    ],
+    items: ["CAN / CAN-FD", "BMS", "VCU", "Motor controller", "CAN analyser"],
   },
   {
-    key: "arch",
-    title: "Firmware Architecture",
+    id: "rtos",
+    level: 2,
+    title: "RTOS & Drivers",
+    caption: "Deterministic, interrupt-driven, low-power",
+    accent: "cyan" as const,
+    items: ["FreeRTOS", "CMSIS-RTOS", "embOS", "UART / SPI / I2C", "DMA", "Bootloaders", "Low-power"],
+  },
+  {
+    id: "silicon",
+    level: 1,
+    title: "Silicon",
+    caption: "MCUs I have shipped production code on",
     accent: "lime" as const,
-    caption: "What separates working from reliable",
-    items: [
-      "Bootloaders",
-      "Interrupt-driven Design",
-      "Multi-threading",
-      "Memory Optimisation",
-      "Low-power Design",
-      "DMA",
-      "Peripheral Drivers",
-      "State Machines",
-    ],
-  },
-  {
-    key: "tools",
-    title: "Debug & Validation",
-    accent: "amber" as const,
-    caption: "Proving it works before the field does",
-    items: [
-      "JTAG / SWD",
-      "Logic Analyser",
-      "Oscilloscope",
-      "CAN Analyser",
-      "STM32CubeIDE",
-      "Keil uVision",
-      "Git",
-      "Jira",
-    ],
+    items: ["TI MCU", "STM32 F1 / F4", "ESP32 / S3", "ARM Cortex-M", "ATmega328P", "8051"],
   },
 ] as const;
 
+export const bench = {
+  title: "On the bench",
+  items: ["JTAG / SWD", "Logic analyser", "Oscilloscope", "CAN analyser", "STM32CubeIDE", "Keil µVision", "Git", "Jira"],
+  languages: ["C", "C++", "Python", "MATLAB", "Assembly"],
+} as const;
+
 export const services = [
   {
-    title: "EV Firmware Development",
+    title: "EV IoT & ECU Firmware",
     icon: "battery" as const,
-    body: "Production firmware for vehicle-side ECUs — BMS interfacing, VCU and motor-controller communication over CAN, and the state machines that keep a vehicle safe when something goes wrong.",
-    tags: ["CAN", "BMS", "VCU", "TI MCU", "STM32"],
+    body: "Production firmware for vehicle-side cards and ECUs — BMS interfacing, VCU and motor-controller communication over CAN, and the state machines that keep a vehicle safe when something goes wrong.",
+    tags: ["TI MCU", "STM32", "CAN", "BMS", "VCU"],
   },
   {
-    title: "Telematics & Connectivity",
+    title: "Telematics & Fleet Connectivity",
     icon: "signal" as const,
-    body: "Cellular-connected vehicle intelligence: Quectel and Neoway modem integration, MQTT telemetry pipelines, GPS tracking, and AIS-140-aligned device behaviour.",
-    tags: ["Quectel EC200", "MQTT", "GPS", "AIS-140"],
+    body: "Cellular-connected vehicle intelligence end to end: Quectel / Neoway modem integration, GPS tracking, telemetry pipelines into fleet platforms, BLE apps for direct vehicle control, and AIS-140-aligned behaviour.",
+    tags: ["Quectel EC200", "GPS", "BLE", "MQTT", "AIS-140"],
   },
   {
-    title: "OTA & Bootloader Design",
+    title: "OTA, Bootloaders & Field Updates",
     icon: "upload" as const,
-    body: "Field-updatable devices done properly — flash layout, image validation, safe rollback, and update transport over UART, HTTP or cellular.",
+    body: "Field-updatable devices done properly — flash layout, image validation, safe rollback, and update transport over UART, HTTP or cellular. Fixes reach 20,000 vehicles without a single service visit.",
     tags: ["FOTA", "Flash Layout", "CRC", "Rollback"],
   },
   {
-    title: "Hardware Bring-up & Debug",
+    title: "Bring-up, Debug & Fleet Data",
     icon: "scope" as const,
-    body: "New board, nothing boots, no idea why. Schematic review, bring-up, signal validation on scope and logic analyser, and JTAG/SWD debugging down to the register.",
-    tags: ["Bring-up", "JTAG / SWD", "Signal Validation"],
+    body: "New board, nothing boots. Schematic review, bring-up, JTAG/SWD down to the register — and once it ships, reading the fleet's telemetry to find what the field is really doing to your firmware.",
+    tags: ["Bring-up", "JTAG / SWD", "Fleet Analytics"],
   },
 ] as const;
 

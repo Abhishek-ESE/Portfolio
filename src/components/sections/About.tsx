@@ -1,167 +1,182 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { Section, SectionHeading, Reveal } from "@/components/ui/Primitives";
-import { site } from "@/data/site";
 
-/* ── Holographic portrait ────────────────────────────────── */
-function Portrait() {
-  const wrap = useRef<HTMLDivElement>(null);
-  const [broken, setBroken] = useState(false);
+/* ── Live VIM panel ──────────────────────────────────────────
+   A simulated Vehicle Intelligence Module readout: 16 BMS cells,
+   pack state and a CAN frame log. Not a screenshot — it runs.
+   ─────────────────────────────────────────────────────────── */
+const CELLS = 16;
+const CAN_IDS = [
+  { id: "0x1A0", name: "BMS_PACK" },
+  { id: "0x1A1", name: "BMS_CELL" },
+  { id: "0x2B4", name: "MCU_STAT" },
+  { id: "0x3C2", name: "VCU_CMD" },
+  { id: "0x18F", name: "GNSS_POS" },
+  { id: "0x4E0", name: "VIM_HB" },
+];
 
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const rx = useSpring(useTransform(my, [-0.5, 0.5], [11, -11]), {
-    stiffness: 160,
-    damping: 18,
-  });
-  const ry = useSpring(useTransform(mx, [-0.5, 0.5], [-14, 14]), {
-    stiffness: 160,
-    damping: 18,
-  });
+const hex = (n: number) => n.toString(16).toUpperCase().padStart(2, "0");
 
-  const onMove = (e: React.MouseEvent) => {
-    const el = wrap.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    mx.set((e.clientX - r.left) / r.width - 0.5);
-    my.set((e.clientY - r.top) / r.height - 0.5);
-  };
+type Frame = { t: string; id: string; name: string; dlc: number; data: string };
 
-  const reset = () => {
-    mx.set(0);
-    my.set(0);
-  };
+function useTelemetry() {
+  const [cells, setCells] = useState<number[]>(() =>
+    Array.from({ length: CELLS }, (_, i) => 3.66 + Math.sin(i * 1.3) * 0.025),
+  );
+  const [soc, setSoc] = useState(87.2);
+  const [amps, setAmps] = useState(-12.4);
+  const [temp, setTemp] = useState(31.4);
+  const [frames, setFrames] = useState<Frame[]>([]);
+  const tick = useRef(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      tick.current += 1;
+      const t = tick.current;
+      setCells((prev) =>
+        prev.map((v, i) => {
+          const next = v + (Math.random() - 0.5) * 0.006 + Math.sin(t / 9 + i) * 0.0008;
+          return Math.min(3.74, Math.max(3.58, next));
+        }),
+      );
+      setSoc((s) => Math.max(20, s - 0.004));
+      setAmps(-8 - Math.random() * 14 + Math.sin(t / 6) * 3);
+      setTemp((x) => x + (Math.random() - 0.5) * 0.08);
+
+      const src = CAN_IDS[t % CAN_IDS.length];
+      const bytes = Array.from({ length: 8 }, () => hex(Math.floor(Math.random() * 256))).join(" ");
+      const stamp = (t * 0.047).toFixed(3).padStart(8, " ");
+      setFrames((f) => [{ t: stamp, id: src.id, name: src.name, dlc: 8, data: bytes }, ...f].slice(0, 7));
+    }, 420);
+    return () => clearInterval(id);
+  }, []);
+
+  return { cells, soc, amps, temp, frames };
+}
+
+function VimPanel() {
+  const { cells, soc, amps, temp, frames } = useTelemetry();
+  const min = Math.min(...cells);
+  const max = Math.max(...cells);
+  const delta = ((max - min) * 1000).toFixed(0);
+  const pack = (cells.reduce((a, b) => a + b, 0)).toFixed(2);
 
   return (
-    <div className="relative mx-auto w-full max-w-sm" style={{ perspective: 1100 }}>
-      {/* Orbiting ring behind the frame */}
-      <div className="pointer-events-none absolute -inset-8 opacity-70">
-        <svg viewBox="0 0 400 400" className="h-full w-full">
-          <defs>
-            <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.9" />
-              <stop offset="55%" stopColor="#a3e635" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="#00e5ff" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <motion.ellipse
-            cx="200"
-            cy="200"
-            rx="184"
-            ry="184"
-            fill="none"
-            stroke="url(#ringGrad)"
-            strokeWidth="1"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
-            style={{ transformOrigin: "200px 200px" }}
-          />
-          <motion.ellipse
-            cx="200"
-            cy="200"
-            rx="196"
-            ry="150"
-            fill="none"
-            stroke="#00e5ff"
-            strokeOpacity="0.18"
-            strokeWidth="1"
-            strokeDasharray="3 9"
-            animate={{ rotate: -360 }}
-            transition={{ duration: 52, repeat: Infinity, ease: "linear" }}
-            style={{ transformOrigin: "200px 200px" }}
-          />
-        </svg>
+    <div className="hud-corners noise relative rounded-xl border border-volt/25 bg-abyss/90 p-4 shadow-[0_30px_80px_-30px_rgba(0,229,255,0.35)] sm:p-5">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-3 border-b border-hairline pb-3">
+        <div className="flex items-center gap-2.5">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-lime opacity-75 animate-pulse-ring" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-lime" />
+          </span>
+          <span className="whitespace-nowrap font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink">
+            BMS card · live
+          </span>
+        </div>
+        <div className="hidden items-center gap-3 font-mono text-[9px] uppercase tracking-[0.14em] text-ink-faint sm:flex">
+          <span>CAN1 500k</span>
+          <span className="text-lime">EC200 REG</span>
+          <span>GNSS 3D</span>
+        </div>
       </div>
 
-      <motion.div
-        ref={wrap}
-        onMouseMove={onMove}
-        onMouseLeave={reset}
-        style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
-        className="group relative aspect-[4/5] w-full"
-      >
-        {/* Glow bed */}
-        <div className="absolute -inset-3 rounded-2xl bg-[conic-gradient(from_140deg,rgba(0,229,255,0.35),rgba(163,230,53,0.22),rgba(0,229,255,0.35))] opacity-40 blur-2xl transition-opacity duration-700 group-hover:opacity-70" />
-
-        <div className="relative h-full w-full overflow-hidden rounded-2xl border border-volt/25 bg-carbon">
-          {broken ? (
-            <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[radial-gradient(circle_at_50%_35%,#0e2a33,#04060a)]">
-              <span className="font-display text-6xl font-bold text-gradient-volt">
-                {site.initials}
-              </span>
-              <span className="px-6 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">
-                add /public/profile.jpg
-              </span>
-            </div>
-          ) : (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={site.photo}
-              alt={`${site.name}, Embedded Software Engineer`}
-              onError={() => setBroken(true)}
-              className="portrait-holo h-full w-full object-cover object-center transition-transform duration-[1.2s] group-hover:scale-[1.05]"
-            />
-          )}
-
-          {/* Holographic passes */}
-          <div className="portrait-tint pointer-events-none absolute inset-0" />
-          <div className="portrait-scanlines pointer-events-none absolute inset-0 opacity-45" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void via-void/25 to-transparent" />
-
-          {/* Sweeping scan bar */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-volt/22 to-transparent animate-scan" />
-
-          {/* Corner brackets */}
-          {[
-            "left-3 top-3 border-l border-t",
-            "right-3 top-3 border-r border-t",
-            "left-3 bottom-3 border-l border-b",
-            "right-3 bottom-3 border-r border-b",
-          ].map((c) => (
-            <span
-              key={c}
-              className={`pointer-events-none absolute h-5 w-5 border-volt/70 ${c}`}
-            />
-          ))}
-
-          {/* HUD readout */}
-          <div className="absolute inset-x-3 bottom-3 flex items-end justify-between">
-            <div>
-              <p className="font-display text-sm font-semibold text-ink">
-                {site.name}
-              </p>
-              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-volt">
-                {site.location}
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5 rounded border border-lime/30 bg-lime/10 px-2 py-1">
-              <span className="h-1 w-1 rounded-full bg-lime" />
-              <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-lime-soft">
-                Live
-              </span>
-            </div>
+      {/* Pack readouts */}
+      <div className="mt-4 grid grid-cols-4 gap-2">
+        {[
+          { k: "SOC", v: `${soc.toFixed(1)}%`, tone: "text-volt" },
+          { k: "Pack", v: `${pack} V`, tone: "text-ink" },
+          { k: "Current", v: `${amps.toFixed(1)} A`, tone: "text-amber-sig" },
+          { k: "Temp", v: `${temp.toFixed(1)} °C`, tone: "text-ink" },
+        ].map((r) => (
+          <div key={r.k} className="rounded-md border border-hairline bg-void/60 px-2.5 py-2">
+            <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-ink-faint">{r.k}</div>
+            <div className={`mt-0.5 font-display text-base font-bold tabular-nums sm:text-lg ${r.tone}`}>{r.v}</div>
           </div>
+        ))}
+      </div>
+
+      {/* Cell voltages */}
+      <div className="mt-4">
+        <div className="flex items-baseline justify-between">
+          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-ink-faint">
+            Cell voltages · {CELLS}S
+          </span>
+          <span className="font-mono text-[9px] tabular-nums text-ink-faint">
+            min {min.toFixed(3)} · max {max.toFixed(3)} · Δ{" "}
+            <span className={Number(delta) > 60 ? "text-amber-sig" : "text-lime"}>{delta} mV</span>
+          </span>
         </div>
-      </motion.div>
+        <div className="mt-2 flex h-20 items-end gap-[3px]">
+          {cells.map((v, i) => {
+            const pct = ((v - 3.5) / 0.3) * 100;
+            const hot = v === max;
+            const low = v === min;
+            return (
+              <div key={i} className="group relative flex h-full flex-1 items-end">
+                <div
+                  className={`w-full rounded-sm transition-[height] duration-500 ${
+                    hot ? "bg-amber-sig" : low ? "bg-volt-deep" : "bg-volt/80"
+                  }`}
+                  style={{ height: `${Math.max(8, Math.min(100, pct))}%` }}
+                />
+                <span className="pointer-events-none absolute -top-4 left-1/2 hidden -translate-x-1/2 font-mono text-[8px] tabular-nums text-ink group-hover:block">
+                  {v.toFixed(3)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-1 flex justify-between font-mono text-[8px] tabular-nums text-ink-faint">
+          <span>C1</span><span>C8</span><span>C16</span>
+        </div>
+      </div>
+
+      {/* CAN log */}
+      <div className="mt-4 rounded-md border border-hairline bg-void/70 p-2.5">
+        <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.18em] text-ink-faint">
+          <span>CAN1 · RX</span>
+          <span>{frames.length ? "streaming" : "waiting"}</span>
+        </div>
+        <ul className="mt-1.5 space-y-[3px] font-mono text-[9.5px] leading-tight sm:text-[10px]">
+          {frames.map((f, i) => (
+            <li
+              key={`${f.t}-${i}`}
+              className={`flex gap-2 whitespace-nowrap tabular-nums ${i === 0 ? "text-ink" : "text-ink-faint"}`}
+            >
+              <span className="w-14 shrink-0 text-right">{f.t}</span>
+              <span className="w-11 shrink-0 text-volt">{f.id}</span>
+              <span className="hidden w-16 shrink-0 text-ink-dim sm:inline">{f.name}</span>
+              <span className="shrink-0">[{f.dlc}]</span>
+              <span className="truncate">{f.data}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-ink-faint">
+        <span>Uplink → VEC-TR · 1 Hz</span>
+        <span className="text-lime">last ack 0.3 s</span>
+      </div>
     </div>
   );
 }
 
 const SIGNALS = [
-  { k: "Current", v: "Vecmocon Technologies" },
-  { k: "Domain", v: "EV · Vehicle Intelligence" },
+  { k: "Team", v: "IoT · Vecmocon Technologies" },
+  { k: "Builds", v: "BMS IoT card · Fleet GPS device" },
   { k: "Silicon", v: "TI MCU · STM32 · ESP32" },
-  { k: "Bus", v: "CAN · BMS · VCU" },
-  { k: "Uplink", v: "Quectel EC200 · MQTT" },
-  { k: "Standard", v: "AIS-140" },
+  { k: "Bus", v: "CAN · BMS · VCU · Motor ctrl" },
+  { k: "Uplink", v: "Quectel EC200 → VEC-TR / Battery Buddy" },
+  { k: "Fleet", v: "20,000+ devices in the field" },
 ];
 
 export function About() {
   return (
     <Section id="about">
-      <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-20">
+      <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-16">
         <div>
           <SectionHeading
             index="01"
@@ -178,46 +193,45 @@ export function About() {
           <Reveal delay={0.08}>
             <div className="mt-8 space-y-5 text-[15px] leading-relaxed text-ink-dim">
               <p>
-                I&apos;m an embedded software engineer building the systems that
-                power electric vehicles — with reliability as a design priority,
-                not an afterthought. At{" "}
-                <strong className="font-semibold text-ink">Vecmocon</strong> I
-                develop firmware on TI MCUs and STM32/ESP32 for Vehicle
-                Intelligence Modules: automotive-grade IoT devices that interface
-                with a vehicle&apos;s BMS, motor controller and VCU over CAN, and
-                stay connected through Quectel EC200-series cellular modules.
+                I&apos;m an embedded software engineer on the IoT team at{" "}
+                <strong className="font-semibold text-ink">Vecmocon Technologies</strong>,
+                where we build the connected hardware that ships inside electric
+                two- and three-wheelers. I work across several IoT cards — a
+                BMS-integrated card and fleet-management GPS devices — writing TI
+                MCU firmware that talks to the vehicle&apos;s BMS, motor controller and
+                VCU over CAN and gets the data off the vehicle through Quectel
+                EC200 cellular.
               </p>
               <p>
-                Rigorous testing and debugging are part of how I write code, not a
-                phase at the end. A device that is genuinely field-reliable is what
-                lets a company win and keep large OEM and fleet clients — that&apos;s
-                the standard I hold my own work to. I&apos;m also building hands-on
-                expertise in{" "}
-                <strong className="font-semibold text-ink">AIS-140</strong>,
-                India&apos;s compliance standard for vehicle tracking and telematics
-                devices.
+                The data lands in{" "}
+                <strong className="font-semibold text-ink">VEC-TR</strong> and{" "}
+                <strong className="font-semibold text-ink">Battery Buddy</strong>,
+                our in-house platforms for fleet storage and analytics, and I spend
+                real time on the other side of that pipe: analysing telemetry from
+                20,000+ deployed devices to find what the field is doing to our
+                firmware. I also built a BLE mobile app for EV scooter control and
+                a fleet-management UI that talk directly to the card.
               </p>
               <p>
-                Before Vecmocon, at{" "}
-                <strong className="font-semibold text-ink">MLworkX</strong> I led
-                end-to-end embedded product development for global clients — from
-                schematic design through firmware architecture to commercial
-                deployment — across STM32, ESP32 and 8051 platforms. One project
-                ties straight into my EV focus: a vehicle telematics device on
-                STM32 that pulls real vehicle data over CAN, connects via Neoway
-                N58 GSM, routes telemetry to the cloud through MQTT and supports
-                FOTA for remote upgrades.
+                Reliability is the whole job. A device that is genuinely
+                field-dependable is what lets a company win and keep OEM and fleet
+                clients, so testing and debugging are part of how I write code,
+                not a phase at the end. Right now I&apos;m adding MATLAB/Simulink for
+                application-layer code on the card, going deeper on BMS, and
+                building working knowledge of{" "}
+                <strong className="font-semibold text-ink">AIS-140</strong>.
               </p>
               <p>
-                Alongside the firmware work I&apos;ve published IEEE research on THz
-                MIMO antenna design and hold a granted Indian patent. I&apos;m
-                deliberately building deep expertise in EV embedded systems, with
-                the goal of growing into broader technical ownership in the space.
+                Before Vecmocon, at MLworkX I owned embedded products for global
+                clients end to end — schematic design through firmware architecture
+                to commercial deployment — including a vehicle telematics device on
+                STM32 with CAN, Neoway N58 GSM, MQTT to ThingsBoard and FOTA. I also
+                hold a granted Indian patent and an IEEE best-paper award from my
+                antenna research.
               </p>
             </div>
           </Reveal>
 
-          {/* Signal table */}
           <Reveal delay={0.14}>
             <dl className="mt-10 grid grid-cols-1 gap-x-10 gap-y-0 sm:grid-cols-2">
               {SIGNALS.map((s) => (
@@ -238,7 +252,10 @@ export function About() {
         </div>
 
         <Reveal delay={0.1} className="lg:pt-24">
-          <Portrait />
+          <VimPanel />
+          <p className="mt-3 text-center font-mono text-[9px] uppercase tracking-[0.18em] text-ink-faint">
+            Simulated readout · the real one is under NDA
+          </p>
         </Reveal>
       </div>
     </Section>

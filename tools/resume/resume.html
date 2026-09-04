@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Abhishek Agrahari — Résumé</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 210mm; }
+  body {
+    font-family: "Segoe UI", "Calibri", Arial, sans-serif;
+    font-size: 9.1pt;
+    line-height: 1.27;
+    color: #1a2230;
+    padding: 8.5mm 11mm 7.5mm 11mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8mm; }
+  .head-main { flex: 1; }
+  h1 { font-size: 21pt; font-weight: 700; letter-spacing: -0.3pt; color: #0b1220; line-height: 1.05; }
+  .title { margin-top: 2pt; font-size: 10.4pt; font-weight: 600; color: #0e7490; }
+  .contact { margin-top: 4pt; font-size: 8.4pt; color: #3b4658; line-height: 1.45; }
+  .contact .sep { color: #a7b1c2; padding: 0 4pt; }
+  .photo {
+    width: 25mm; height: 25mm; flex-shrink: 0;
+    border-radius: 4pt; object-fit: cover; object-position: center 15%;
+    border: 1.5pt solid #0e7490;
+  }
+
+  h2 {
+    margin: 5pt 0 2.8pt;
+    font-size: 8.8pt; font-weight: 700; letter-spacing: 1.1pt; text-transform: uppercase;
+    color: #0e7490; padding-bottom: 1.5pt;
+    border-bottom: 1.2pt solid #0e7490;
+    display: flex; align-items: baseline; gap: 6pt;
+  }
+  h2::after { content: ""; flex: 1; border-bottom: 0.5pt solid #cfd6e0; transform: translateY(-2.2pt); }
+
+  p.summary { text-align: justify; }
+
+  .skills { display: grid; grid-template-columns: 29.5mm 1fr; row-gap: 1.1pt; column-gap: 4pt; }
+  .skills b { font-weight: 700; color: #0b1220; white-space: nowrap; }
+
+  .entry { margin-bottom: 3.6pt; page-break-inside: avoid; }
+  .entry:last-child { margin-bottom: 0; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 6pt; }
+  .role { font-weight: 700; font-size: 9.7pt; color: #0b1220; }
+  .org { font-weight: 600; color: #0e7490; }
+  .meta { font-size: 8.3pt; color: #5b6778; white-space: nowrap; }
+  .sub { font-size: 8.4pt; color: #5b6778; }
+  ul { margin: 1.3pt 0 0 0; padding-left: 10pt; }
+  li { margin-bottom: 0.8pt; padding-left: 1pt; }
+  li::marker { color: #0e7490; }
+  ul.proj li { margin-bottom: 1.5pt; }
+  ul.proj b { color: #0b1220; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
+  .cert { margin-top: 2.5pt; font-size: 8.5pt; color: #3b4658; }
+  .cert b, .sub b { color: #0b1220; }
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div class="head-main">
+    <h1>ABHISHEK AGRAHARI</h1>
+    <div class="title">Embedded Software Engineer &nbsp;·&nbsp; EV IoT, Telematics &amp; Vehicle Intelligence</div>
+    <div class="contact">
+      Noida, India<span class="sep">|</span>+91 89573 99440<span class="sep">|</span><a href="mailto:abhishekagrahari0031@gmail.com">abhishekagrahari0031@gmail.com</a><br>
+      <a href="https://www.linkedin.com/in/abhishekagrahari-embedded/">linkedin.com/in/abhishekagrahari-embedded</a><span class="sep">|</span><a href="https://github.com/Abhishek-ESE">github.com/Abhishek-ESE</a>
+    </div>
+  </div>
+  <img class="photo" src="{{PHOTO}}" alt="Abhishek Agrahari">
+</header>
+
+<h2>Professional Summary</h2>
+<p class="summary">
+  Embedded Software Engineer on the IoT team at Vecmocon, building the connected cards inside electric two- and three-wheelers —
+  a BMS-integrated IoT card and fleet-management GPS devices on TI MCUs with Quectel EC200 cellular, streaming into VEC-TR and Battery
+  Buddy (in-house fleet data platforms). Analyse telemetry from 20,000+ deployed devices; built a BLE app for EV scooter control and
+  fleet management. Previously owned products end-to-end from schematic to commercial deployment: 2,000+ units validated, field
+  issues cut by 90%. Strong in FreeRTOS, bootloaders/FOTA, low-power design and hardware bring-up.
+</p>
+
+<h2>Technical Skills</h2>
+<div class="skills">
+  <b>EV &amp; Automotive</b><span>CAN / CAN-FD, BMS &amp; VCU integration, motor-controller comms, fleet telematics &amp; GPS tracking, AIS-140, FOTA / OTA</span>
+  <b>Microcontrollers</b><span>TI MCU, STM32 (F1 / F4), ESP32 / ESP32-S3, ARM Cortex-M, ATmega328P, 8051</span>
+  <b>Languages / RTOS</b><span>C, C++, Python, MATLAB / Simulink, Assembly &nbsp;·&nbsp; FreeRTOS, CMSIS-RTOS, embOS, bare-metal</span>
+  <b>Connectivity</b><span>UART, SPI, I2C, CAN, BLE, MQTT, HTTP, NB-IoT &nbsp;·&nbsp; Quectel EC200-series, Neoway N58 cellular modules</span>
+  <b>Cloud &amp; Data</b><span>VEC-TR, Battery Buddy, ThingsBoard, MQTT telemetry pipelines, fleet data analysis</span>
+  <b>Firmware &amp; Tools</b><span>Bootloaders, interrupt-driven design, DMA, low-power, memory optimisation &nbsp;·&nbsp; JTAG / SWD, logic analyser, oscilloscope, CAN analyser, STM32CubeIDE, Keil, Git, Jira</span>
+</div>
+
+<h2>Work Experience</h2>
+
+<div class="entry">
+  <div class="row">
+    <div><span class="role">Embedded Software Engineer — IoT Team</span> &nbsp;·&nbsp; <span class="org">Vecmocon Technologies</span></div>
+    <div class="meta">May 2026 – Present &nbsp;·&nbsp; Noida</div>
+  </div>
+  <ul>
+    <li>Develop TI MCU firmware for multiple EV IoT cards — a BMS-integrated card and fleet-management GPS devices — each interfacing the vehicle's BMS, motor controller and VCU over CAN for OEM and fleet deployments.</li>
+    <li>Integrate Quectel EC200-series cellular modules for real-time uplink; stream device telemetry into Battery Buddy and VEC-TR, Vecmocon's in-house server for fleet data storage and analytics.</li>
+    <li>Built a BLE mobile app for EV scooter control and a fleet-management user interface that communicate directly with the IoT card.</li>
+    <li>Analyse fleet telemetry from 20,000+ devices deployed in the market to surface field failure patterns and feed fixes back into firmware; developing application-layer code in MATLAB/Simulink and building AIS-140 compliance expertise.</li>
+  </ul>
+</div>
+
+<div class="entry">
+  <div class="row">
+    <div><span class="role">Embedded Software Engineer</span> &nbsp;·&nbsp; <span class="org">MLworkX Pvt. Ltd.</span></div>
+    <div class="meta">Jun 2025 – May 2026 &nbsp;·&nbsp; Noida</div>
+  </div>
+  <ul>
+    <li>Led end-to-end R&amp;D of production embedded products for global clients — schematic design through firmware architecture to commercial deployment — across STM32, ESP32 and 8051 platforms; integrated Neoway N58 cellular for real-time IoT communication.</li>
+    <li>Led real-time debugging and validation (oscilloscope, logic analyser, JTAG/SWD) — reduced field issues by 90% and validated 2,000+ production units; optimised firmware for low power and owned board bring-up.</li>
+  </ul>
+</div>
+
+<div class="entry">
+  <div class="row">
+    <div><span class="role">Embedded Software Engineer Intern</span> &nbsp;·&nbsp; <span class="org">Surfytech Electronics</span></div>
+    <div class="meta">Dec 2024 – May 2025 &nbsp;·&nbsp; Ghaziabad</div>
+  </div>
+  <ul>
+    <li>Developed C/C++ firmware on ATmega328P and STM32 with FreeRTOS; built a UART-based FOTA bootloader and a complete RFID access-control system; optimised interrupt handling and memory footprint.</li>
+  </ul>
+</div>
+
+<h2>Key Projects</h2>
+<ul class="proj">
+  <li><b>EV IoT Cards — BMS &amp; Fleet GPS</b> <span class="sub">(Vecmocon · TI MCU · Quectel EC200 · 2026)</span> — Firmware for a family of automotive IoT cards: BMS/VCU/motor-controller acquisition over CAN, cellular uplink, GPS tracking with AIS-140-aligned behaviour, telemetry pipeline into VEC-TR and Battery Buddy. Production hardware in OEM vehicles.</li>
+  <li><b>BLE App — EV Scooter Control &amp; Fleet UI</b> <span class="sub">(Vecmocon · 2026)</span> — Mobile app talking directly to the IoT card over BLE with a defined command/response protocol for scooter control and diagnostics, plus a fleet-management interface for operators.</li>
+  <li><b>Fleet Telemetry Analysis — 20K Devices</b> <span class="sub">(Vecmocon · 2026)</span> — Analysed field data from 20,000+ deployed devices in VEC-TR / Battery Buddy to identify recurring failure and connectivity patterns; findings fed into firmware priorities and validation cases.</li>
+  <li><b>Vehicle Telematics Device</b> <span class="sub">(STM32 · Neoway N58 GSM · CAN · Jul–Sep 2025)</span> — Live vehicle data over CAN, telemetry to ThingsBoard via MQTT, FOTA over HTTP for remote firmware upgrades.</li>
+  <li><b>Automatic Pill Dispenser</b> <span class="sub">(Commercial product, US client · Nov 2025–Mar 2026)</span> — STM32F103 firmware controlling 4 motors and multiple sensors; Android S720 board for UI. Delivered end-to-end, in commercial production.</li>
+  <li><b>Smart Hip Trainer</b> <span class="sub">(Wearable · ESP32-S3 · Jan–Mar 2026)</span> — Owned schematic design and firmware; Bosch BNO055 IMU motion tracking streamed live to a companion app over BLE.</li>
+</ul>
+
+<div class="cols">
+  <div>
+    <h2>Education</h2>
+    <div class="entry">
+      <div class="role">B.Tech — Electronics &amp; Communication Engineering</div>
+      <div class="sub">United College of Engineering and Research, AKTU Lucknow</div>
+      <div class="sub">Sept 2021 – May 2025 &nbsp;·&nbsp; <b>CGPA 8.6 / 10.0 — Department Topper</b></div>
+    </div>
+    <div class="cert"><b>Certifications:</b> Design &amp; Fabrication of Electronic Circuits · Innovation in Circuit Engineering using IoT · Springer Conference Presentation · Letter of Appreciation</div>
+  </div>
+  <div>
+    <h2>Achievements</h2>
+    <ul>
+      <li>Presented a live demo of the RedRaven™ fire detection system aboard <b>INS Airavat</b> to the Admiral and Head of Naval Dockyard, Visakhapatnam.</li>
+      <li><b>Granted Indian Patent</b> — MIMO antenna design.</li>
+      <li><b>Best Paper Award, ETMCIS 2024 (IEEE)</b> — Hybrid Metal-Graphene THz MIMO Antenna; 2 papers published in international journals/conferences.</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

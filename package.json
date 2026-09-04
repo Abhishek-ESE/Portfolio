@@ -6,13 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "resume": "node tools/resume/build.js",
+    "photo": "python tools/photo/enhance.py tools/photo/source.jpg"
   },
   "dependencies": {
     "@react-three/drei": "^10.0.6",
     "@react-three/fiber": "^9.1.2",
     "@react-three/postprocessing": "^3.0.4",
     "framer-motion": "^12.6.3",
+    "lenis": "^1.3.26",
     "next": "^15.2.4",
     "postprocessing": "^6.36.6",
     "react": "^19.1.0",
@@ -25,6 +28,7 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.1",
     "@types/three": "^0.175.0",
+    "puppeteer-core": "^23.11.1",
     "tailwindcss": "^4.1.3",
     "typescript": "^5.8.3"
   }

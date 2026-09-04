@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import { Saira, Inter, JetBrains_Mono } from "next/font/google";
 import { site } from "@/data/site";
 import "./globals.css";
 
-const space = Space_Grotesk({
+// Saira: semi-condensed with motorsport / automotive DNA — reads as spec-sheet,
+// not as the grotesk every generated portfolio ships with.
+const space = Saira({
   subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
   variable: "--font-space",
   display: "swap",
 });

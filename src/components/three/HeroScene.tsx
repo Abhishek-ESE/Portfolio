@@ -44,16 +44,17 @@ function CameraRig({ children }: { children: ReactNode }) {
   const mid = width >= 640;
 
   useEffect(() => {
-    if (wide) camera.position.set(-2.25, 0.3, 9.1);
-    else if (mid) camera.position.set(-0.9, 1.5, 9.6);
-    else camera.position.set(0, 2.6, 11);
+    // The portrait now owns the right column; the module sits low behind it.
+    if (wide) camera.position.set(-2.6, 2.1, 10.6);
+    else if (mid) camera.position.set(-0.6, 2.4, 11.2);
+    else camera.position.set(0, 3.2, 12.5);
     camera.lookAt(camera.position.x, camera.position.y, 0);
     camera.updateProjectionMatrix();
     // Needed for the reduced-motion "demand" frameloop, which won't redraw on its own.
     invalidate();
   }, [camera, invalidate, wide, mid]);
 
-  return <group scale={wide ? 0.92 : mid ? 0.85 : 0.72}>{children}</group>;
+  return <group scale={wide ? 0.82 : mid ? 0.78 : 0.66}>{children}</group>;
 }
 
 export default function HeroScene() {

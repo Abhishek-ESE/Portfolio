@@ -46,7 +46,10 @@ export function SectionHeading({
   align?: "left" | "center";
 }) {
   return (
-    <Reveal className={align === "center" ? "text-center" : ""}>
+    <Reveal className={`relative ${align === "center" ? "text-center" : ""}`}>
+      <span className="watermark" aria-hidden="true">
+        {index}
+      </span>
       <div
         className={`flex items-center gap-3 ${
           align === "center" ? "justify-center" : ""

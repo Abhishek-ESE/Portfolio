@@ -16,8 +16,9 @@ export function Starfield({ count = 900 }: { count?: number }) {
     const pale = new THREE.Color("#7f92ad");
 
     for (let i = 0; i < count; i++) {
-      // Shell distribution — keeps the middle clear for the module.
-      const r = 9 + Math.random() * 16;
+      // Shell distribution — keeps the middle clear for the module, and starts
+      // beyond the camera so no single point ever lands next to the lens.
+      const r = 15 + Math.random() * 14;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);

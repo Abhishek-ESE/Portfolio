@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Section, SectionHeading, Reveal, Panel, Tag } from "@/components/ui/Primitives";
-import { services, skillGroups } from "@/data/site";
+import { services, stackLayers, bench } from "@/data/site";
 
 /* ── Line icons, drawn not imported ──────────────────────── */
 function Icon({ name }: { name: "battery" | "signal" | "upload" | "scope" }) {
@@ -50,122 +50,88 @@ function Icon({ name }: { name: "battery" | "signal" | "upload" | "scope" }) {
   );
 }
 
-/* ── Skill matrix with filter rail ───────────────────────── */
-function SkillMatrix() {
-  const [activeKey, setActiveKey] = useState<string>(skillGroups[0].key);
-  const active = skillGroups.find((g) => g.key === activeKey) ?? skillGroups[0];
+const ACCENT = {
+  cyan: { text: "text-volt", bar: "bg-volt", ring: "border-volt/45", glow: "shadow-[0_0_40px_-12px_rgba(0,229,255,0.55)]", tag: "volt" as const },
+  lime: { text: "text-lime", bar: "bg-lime", ring: "border-lime/45", glow: "shadow-[0_0_40px_-12px_rgba(163,230,53,0.5)]", tag: "lime" as const },
+  amber: { text: "text-amber-sig", bar: "bg-amber-sig", ring: "border-amber-sig/45", glow: "shadow-[0_0_40px_-12px_rgba(255,176,32,0.5)]", tag: "amber" as const },
+};
 
-  const accentText = {
-    cyan: "text-volt",
-    lime: "text-lime",
-    amber: "text-amber-sig",
-  } as const;
+/* ── Firmware stack diagram ──────────────────────────────── */
+function StackDiagram() {
+  const [active, setActive] = useState<string | null>(null);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
-      {/* Rail */}
-      <div className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0">
-        {skillGroups.map((g) => {
-          const on = g.key === activeKey;
-          return (
-            <button
-              key={g.key}
-              onClick={() => setActiveKey(g.key)}
-              className={`group relative shrink-0 rounded-md border px-4 py-3 text-left transition-all duration-300 lg:w-full ${
-                on
-                  ? "border-volt/45 bg-volt/8"
-                  : "border-hairline bg-carbon/40 hover:border-volt/25"
-              }`}
-            >
-              <span
-                className={`block font-display text-sm font-semibold whitespace-nowrap transition-colors ${
-                  on ? "text-ink" : "text-ink-dim group-hover:text-ink"
-                }`}
-              >
-                {g.title}
-              </span>
-              <span className="mt-0.5 hidden font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint lg:block">
-                {g.items.length} entries
-              </span>
-              {on && (
-                <motion.span
-                  layoutId="skill-rail"
-                  className="absolute inset-y-2 -left-px w-0.5 rounded-full bg-volt"
-                  transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                />
-              )}
-            </button>
-          );
-        })}
+    <div className="relative">
+      {/* Data-flow spine: telemetry climbs from silicon to cloud */}
+      <div className="pointer-events-none absolute bottom-6 left-[3.25rem] top-6 hidden w-px bg-gradient-to-t from-lime/60 via-volt/60 to-lime/60 sm:block">
+        <motion.span
+          className="absolute left-1/2 h-10 w-px -translate-x-1/2 bg-gradient-to-t from-transparent via-white to-transparent"
+          animate={{ top: ["100%", "-10%"] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: "linear" }}
+        />
       </div>
 
-      {/* Panel */}
-      <Panel hover={false} className="min-h-[280px]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={active.key}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="flex items-baseline justify-between gap-4">
-              <h3
-                className={`font-display text-xl font-bold ${accentText[active.accent]}`}
-              >
-                {active.title}
-              </h3>
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                {active.caption}
-              </span>
-            </div>
-
-            <div className="mt-6 flex flex-wrap gap-2">
-              {active.items.map((item, i) => (
-                <motion.span
-                  key={item}
-                  initial={{ opacity: 0, scale: 0.94 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.035, duration: 0.28 }}
+      <ol className="space-y-2.5">
+        {stackLayers.map((layer, i) => {
+          const a = ACCENT[layer.accent];
+          const on = active === layer.id;
+          const dim = active !== null && !on;
+          return (
+            <motion.li
+              key={layer.id}
+              initial={{ opacity: 0, x: -18 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ delay: i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              onMouseEnter={() => setActive(layer.id)}
+              onMouseLeave={() => setActive(null)}
+              onFocus={() => setActive(layer.id)}
+              onBlur={() => setActive(null)}
+              tabIndex={0}
+              className={`group relative grid cursor-default grid-cols-[3.25rem_minmax(0,1fr)] gap-3 rounded-lg border bg-carbon/50 py-3.5 pr-4 transition-all duration-400 sm:grid-cols-[3.25rem_11rem_minmax(0,1fr)] ${
+                on ? `${a.ring} ${a.glow} bg-carbon/85` : "border-hairline"
+              } ${dim ? "opacity-55" : ""}`}
+            >
+              {/* Level badge */}
+              <div className="flex items-start justify-center pt-0.5">
+                <span
+                  className={`flex h-8 w-8 items-center justify-center rounded-md border font-mono text-[11px] font-bold transition-colors ${
+                    on ? `${a.ring} ${a.text} bg-void` : "border-hairline text-ink-faint bg-void/60"
+                  }`}
                 >
-                  <Tag
-                    tone={
-                      active.accent === "cyan"
-                        ? "volt"
-                        : active.accent === "lime"
-                          ? "lime"
-                          : "amber"
-                    }
-                  >
+                  L{layer.level}
+                </span>
+              </div>
+
+              {/* Title */}
+              <div className="min-w-0">
+                <h4 className={`font-display text-base font-semibold uppercase tracking-wide transition-colors ${on ? a.text : "text-ink"}`}>
+                  {layer.title}
+                </h4>
+                <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint">
+                  {layer.caption}
+                </p>
+              </div>
+
+              {/* Items */}
+              <div className="col-span-2 flex flex-wrap gap-1.5 pl-0 sm:col-span-1 sm:pl-0">
+                {layer.items.map((item) => (
+                  <Tag key={item} tone={on ? a.tag : "default"}>
                     {item}
                   </Tag>
-                </motion.span>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {/* Decorative bus line */}
-            <svg
-              viewBox="0 0 600 40"
-              className="mt-8 h-8 w-full opacity-60"
-              aria-hidden="true"
-            >
-              <path
-                d="M0 20 H160 L180 6 H340 L360 34 H600"
-                fill="none"
-                stroke="#1d2634"
-                strokeWidth="1.5"
+              {/* Accent bar */}
+              <span
+                className={`absolute -left-px top-3 bottom-3 w-0.5 rounded-full transition-all duration-400 ${
+                  on ? a.bar : "bg-hairline"
+                }`}
               />
-              <path
-                d="M0 20 H160 L180 6 H340 L360 34 H600"
-                fill="none"
-                stroke="#00e5ff"
-                strokeWidth="1.5"
-                className="trace-line"
-              />
-            </svg>
-          </motion.div>
-        </AnimatePresence>
-      </Panel>
+            </motion.li>
+          );
+        })}
+      </ol>
     </div>
   );
 }
@@ -182,10 +148,10 @@ export function Expertise() {
             <span className="text-gradient-volt">build and fix</span>
           </>
         }
-        lead="Four areas where I take full ownership — from the CAN frame on the wire to the telemetry landing in the cloud."
+        lead="Four kinds of work I take full ownership of — from the CAN frame on the wire to the row in the fleet database."
       />
 
-      {/* Services / consulting offer */}
+      {/* Services */}
       <div className="mt-14 grid gap-5 sm:grid-cols-2">
         {services.map((s, i) => (
           <Reveal key={s.title} delay={i * 0.07}>
@@ -195,12 +161,10 @@ export function Expertise() {
                   <Icon name={s.icon} />
                 </span>
                 <div>
-                  <h3 className="font-display text-lg font-semibold text-ink">
+                  <h3 className="font-display text-lg font-semibold uppercase tracking-wide text-ink">
                     {s.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-dim">
-                    {s.body}
-                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-dim">{s.body}</p>
                   <div className="mt-4 flex flex-wrap gap-1.5">
                     {s.tags.map((t) => (
                       <Tag key={t}>{t}</Tag>
@@ -213,21 +177,72 @@ export function Expertise() {
         ))}
       </div>
 
-      {/* Skill matrix */}
-      <Reveal delay={0.1}>
-        <div className="mt-20">
-          <div className="mb-8 flex items-center gap-3">
-            <span className="font-mono text-xs tracking-[0.28em] text-volt">
-              02.1
-            </span>
-            <span className="h-px w-8 bg-gradient-to-r from-volt to-transparent" />
-            <span className="font-mono text-xs uppercase tracking-[0.28em] text-ink-faint">
-              Technical Matrix
-            </span>
-          </div>
-          <SkillMatrix />
+      {/* Stack diagram + bench */}
+      <div className="mt-20 grid gap-10 lg:grid-cols-[minmax(0,1fr)_260px]">
+        <div>
+          <Reveal>
+            <div className="mb-6 flex items-center gap-3">
+              <span className="font-mono text-xs tracking-[0.28em] text-volt">02.1</span>
+              <span className="h-px w-8 bg-gradient-to-r from-volt to-transparent" />
+              <span className="font-mono text-xs uppercase tracking-[0.28em] text-ink-faint">
+                The stack, bottom to top
+              </span>
+            </div>
+            <p className="mb-6 max-w-xl text-sm leading-relaxed text-ink-dim">
+              Every layer here is somewhere I have shipped production code, from
+              register-level bring-up to the analytics that read the fleet back.
+              Hover a layer.
+            </p>
+          </Reveal>
+          <StackDiagram />
         </div>
-      </Reveal>
+
+        <Reveal delay={0.12}>
+          <div className="space-y-5 lg:sticky lg:top-28">
+            <Panel hover={false}>
+              <h4 className="font-mono text-[10px] uppercase tracking-[0.24em] text-volt">
+                {bench.title}
+              </h4>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {bench.items.map((t) => (
+                  <Tag key={t}>{t}</Tag>
+                ))}
+              </div>
+              <h4 className="mt-6 font-mono text-[10px] uppercase tracking-[0.24em] text-volt">
+                Languages
+              </h4>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {bench.languages.map((t) => (
+                  <Tag key={t} tone="volt">
+                    {t}
+                  </Tag>
+                ))}
+              </div>
+            </Panel>
+
+            <Panel hover={false} className="border-lime/20">
+              <h4 className="font-mono text-[10px] uppercase tracking-[0.24em] text-lime">
+                Building now
+              </h4>
+              <ul className="mt-3 space-y-2.5 text-sm text-ink-dim">
+                {[
+                  ["MATLAB / Simulink", "application-layer code for the IoT card"],
+                  ["BMS internals", "cell balancing, SOC/SOH estimation"],
+                  ["AIS-140", "compliance behaviour for tracking devices"],
+                ].map(([k, v]) => (
+                  <li key={k} className="flex gap-2.5">
+                    <span className="mt-[8px] h-1 w-1 shrink-0 rounded-full bg-lime" />
+                    <span>
+                      <span className="font-semibold text-ink">{k}</span>
+                      <span className="text-ink-faint"> — {v}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          </div>
+        </Reveal>
+      </div>
     </Section>
   );
 }

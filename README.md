@@ -1,77 +1,81 @@
 # Abhishek Agrahari — Portfolio
 
 Personal portfolio for an Embedded Software Engineer / EV firmware consultant.
-A 3D vehicle-intelligence-module (PCB, MCU, CAN packets riding live traces) sits in the hero, followed by
-case-study style project write-ups, an interactive skill matrix, experience timeline and credentials.
+The hero leads with a 3D portrait composition (AI-matted photo, parallax HUD readouts, a procedural
+vehicle-intelligence PCB behind it), followed by a live simulated BMS/CAN panel, a layered firmware-stack
+diagram, experience timeline, case-study projects and credentials.
 
-**Stack:** Next.js 15 (App Router) · React 19 · React Three Fiber + drei + postprocessing · Tailwind CSS v4 · Framer Motion · TypeScript
+**Stack:** Next.js 15 (App Router) · React 19 · React Three Fiber + drei + postprocessing · Tailwind CSS v4 · Framer Motion · Lenis · TypeScript
 
 ---
 
-## 1. Run locally
+## Run locally
 
 ```bash
 npm install
-npm run dev
-# → http://localhost:3000
+npm run dev        # → http://localhost:3000
+npm run build      # production build check
 ```
 
-Production build check:
+## Edit content
 
-```bash
-npm run build
-```
+**Everything on the page comes from one file: [`src/data/site.ts`](src/data/site.ts)** — roles, hero copy, metrics,
+experience, projects, the firmware-stack layers, services, credentials, links.
 
-## 2. Add your two files (do this first)
+To add a project, copy one of the objects in `projects` and fill in `problem` / `build` / `impact` — that is what the
+case-study modal renders. Set `domain` to `"EV"`, `"IoT"`, `"Medical"` or `"Industrial"` for the filter.
 
-Drop these into `public/` — the site works without them, but shows a fallback:
+## Résumé (PDF)
 
-| File | Used for |
+The résumé is generated from HTML so it stays one page, keeps a real text layer for ATS scanners, and matches the site.
+
+1. Edit [`tools/resume/resume.html`](tools/resume/resume.html)
+2. `npm run resume` → writes `public/Abhishek_Agrahari_Resume.pdf` and fails if it no longer fits one A4 page
+
+Needs Microsoft Edge installed (or `EDGE_PATH=<chromium binary>`).
+
+## Photo
+
+`tools/photo/source.jpg` is the original. `python tools/photo/enhance.py` regenerates:
+
+| Output | Used for |
 | --- | --- |
-| `public/profile.jpg` | Your photo in the About section. Portrait orientation, ~800×1000 px, JPG. The site applies the holographic 3D treatment automatically — no editing needed. |
-| `public/Abhishek_Agrahari_Resume.pdf` | The **Résumé** button in the nav and Contact section. |
+| `public/profile-cutout.webp` | Hero 3D portrait (background removed by rembg, alpha tightened) |
+| `public/profile.jpg` | Enhanced photo with backdrop, for social cards / future use |
+| `tools/resume/photo.jpg` | Résumé headshot crop |
 
-## 3. Edit your content
+Python needs `pillow numpy rembg onnxruntime`. On Windows, install them into a venv at a **short path**
+(e.g. `C:\pv`) — onnxruntime's files exceed the 260-character path limit inside deep folders.
+A higher-resolution source photo (the current one is a 400 px LinkedIn export) will noticeably improve the hero.
 
-**Everything on the page comes from one file: [`src/data/site.ts`](src/data/site.ts).**
-Roles, hero copy, metrics, experience, projects, skills, services, credentials, links — change it there and the site updates.
+## Deploy to Vercel (free)
 
-To add a project, copy one of the objects in `projects` and fill in `problem` / `build` / `impact` — that's what the case-study modal renders.
+1. Push to GitHub (wired to `https://github.com/Abhishek-ESE/Portfolio`).
+2. [vercel.com/new](https://vercel.com/new) → **Import** the `Portfolio` repo → **Deploy** with defaults.
+3. Every push to `main` redeploys.
 
-## 4. Deploy to Vercel (free)
+After the first deploy, put the real URL in three places so social cards and SEO point at it:
+`src/app/layout.tsx` (`metadataBase`, `jsonLd.url`), `src/app/robots.ts` (`BASE`), `src/app/sitemap.ts` (`BASE`).
 
-1. Push this repo to GitHub (already wired to `https://github.com/Abhishek-ESE/Portfolio`).
-2. Go to [vercel.com/new](https://vercel.com/new) → **Import** the `Portfolio` repo.
-3. Leave every setting at its default (Vercel detects Next.js). Click **Deploy**.
-4. Every push to `main` redeploys automatically.
-
-After the first deploy, update the domain in three places so social cards and SEO point at the real URL:
-
-- `src/app/layout.tsx` → `metadataBase` and `jsonLd.url`
-- `src/app/robots.ts` → `BASE`
-- `src/app/sitemap.ts` → `BASE`
-
-(Default is `https://abhishek-agrahari.vercel.app`. If you set a custom domain in Vercel, use that instead.)
-
-## 5. Project layout
+## Project layout
 
 ```
 src/
-├─ app/
-│  ├─ layout.tsx          # fonts, metadata, JSON-LD
-│  ├─ page.tsx            # section order
-│  ├─ globals.css         # Tailwind v4 theme tokens + utilities
-│  ├─ opengraph-image.tsx # social share card (auto-generated)
-│  ├─ robots.ts / sitemap.ts
+├─ app/                 layout (fonts, metadata, JSON-LD), page (section order), globals.css, icon, OG image, robots, sitemap
 ├─ components/
-│  ├─ three/              # HeroScene, EcuModule (the PCB), Starfield, SceneMount
-│  ├─ sections/           # Nav, Hero, About, Expertise, Experience, Projects, Credentials, Contact, Chrome
-│  └─ ui/Primitives.tsx   # Reveal, SectionHeading, Tag, Panel, Section
-└─ data/site.ts           # ← all content
+│  ├─ three/            HeroScene (camera rig, bloom), EcuModule (the PCB), Starfield, SceneMount (mounts only while visible)
+│  ├─ sections/         Nav, Hero (3D portrait), About (live VIM panel), Expertise (stack diagram), Experience, Projects, Credentials, Contact, Chrome
+│  ├─ ui/Primitives     Reveal, SectionHeading (watermark numeral), Tag, Panel, Section
+│  ├─ Preloader         firmware-style boot screen, once per session
+│  └─ SmoothScroll      Lenis
+├─ data/site.ts         ← all content
+tools/
+├─ resume/              resume.html + build.js (→ public/…Resume.pdf)
+└─ photo/               enhance.py + source.jpg (→ public/profile*.{jpg,webp})
 ```
 
 ## Notes
 
-- The 3D canvas only mounts while the hero is on screen and unmounts when you scroll away, so the rest of the page stays smooth.
-- Respects `prefers-reduced-motion` (scene renders a single frame, page animations are disabled).
-- No external 3D assets — the module is procedural geometry, so there is nothing to load and nothing to break.
+- The WebGL canvas mounts only while the hero is on screen and unmounts when scrolled away.
+- Respects `prefers-reduced-motion`: single-frame scene, no smooth scroll, no preloader.
+- No external 3D assets — the module is procedural geometry, nothing to load and nothing to break.
