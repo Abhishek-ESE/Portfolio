@@ -1,4 +1,4 @@
-const fallbackUrl = "https://abhishek-agrahari.vercel.app";
+const fallbackUrl = "https://abhishek-agrahari-git-main-abhishek-ese.vercel.app";
 
 function resolveSiteUrl() {
   try {
