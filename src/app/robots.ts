@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/data/site-url";
 
-const BASE = "https://abhishek-agrahari.vercel.app";
+export const dynamic = "force-static";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: "*", allow: "/" },
-    sitemap: `${BASE}/sitemap.xml`,
+    sitemap: `${siteUrl}/sitemap.xml`,
   };
 }

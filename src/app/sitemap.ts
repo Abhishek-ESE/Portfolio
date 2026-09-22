@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/data/site-url";
 
-const BASE = "https://abhishek-agrahari.vercel.app";
+export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: BASE,
-      lastModified: new Date(),
+      url: siteUrl,
       changeFrequency: "monthly",
       priority: 1,
     },

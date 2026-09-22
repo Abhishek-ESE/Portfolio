@@ -1,10 +1,11 @@
 import { ImageResponse } from "next/og";
 import { site } from "@/data/site";
 
+export const dynamic = "force-static";
+
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
-/** Browser-tab icon — the same "AA" monogram as the nav logo. */
 export default function Icon() {
   return new ImageResponse(
     (
@@ -15,14 +16,14 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#04060a",
-          border: "3px solid #00e5ff",
-          borderRadius: 12,
-          color: "#00e5ff",
-          fontSize: 30,
-          fontWeight: 800,
-          letterSpacing: -1,
+          background: "#20342c",
+          borderRadius: 8,
+          color: "#c2ef65",
+          fontSize: 29,
+          fontWeight: 700,
+          letterSpacing: -2,
           fontFamily: "sans-serif",
+          borderBottom: "4px solid #c2ef65",
         }}
       >
         {site.initials}

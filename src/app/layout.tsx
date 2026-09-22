@@ -1,74 +1,61 @@
 import type { Metadata, Viewport } from "next";
-import { Saira, Inter, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { site } from "@/data/site";
+import { siteUrl } from "@/data/site-url";
 import "./globals.css";
 
-// Saira: semi-condensed with motorsport / automotive DNA — reads as spec-sheet,
-// not as the grotesk every generated portfolio ships with.
-const space = Saira({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  variable: "--font-space",
+const geist = localFont({
+  src: "../../public/fonts/geist.woff2",
+  variable: "--font-geist",
   display: "swap",
+  weight: "100 900",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+const geistMono = localFont({
+  src: "../../public/fonts/geist-mono.woff2",
+  variable: "--font-geist-mono",
   display: "swap",
+  weight: "100 900",
 });
 
-const jet = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jet",
-  display: "swap",
-});
-
+const title = `${site.name} — Embedded Software Engineer`;
 const description =
-  "Abhishek Agrahari — Embedded Software Engineer and EV systems consultant. Firmware on TI MCU, STM32 and ESP32 for BMS, VCU and CAN vehicle intelligence, telematics and FOTA.";
+  "Embedded software engineer building firmware for electric vehicles and connected devices. Explore Abhishek Agrahari’s work in EV systems, CAN, cellular connectivity and embedded product development.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://abhishek-agrahari.vercel.app"),
-  title: {
-    default: `${site.name} — Embedded Software Engineer | EV Firmware`,
-    template: `%s — ${site.name}`,
-  },
+  metadataBase: new URL(siteUrl),
+  title: { default: title, template: `%s — ${site.name}` },
   description,
+  alternates: { canonical: "/" },
   keywords: [
-    "Embedded Software Engineer",
-    "EV Firmware Developer",
-    "Embedded EV Consultant",
-    "STM32",
-    "ESP32",
-    "TI MCU",
-    "CAN bus",
-    "BMS",
-    "VCU",
-    "Vehicle Telematics",
-    "AIS-140",
-    "FreeRTOS",
-    "FOTA",
     "Abhishek Agrahari",
+    "Embedded Software Engineer",
+    "EV Firmware",
+    "Vehicle Connectivity",
+    "Embedded C",
+    "STM32",
+    "TI MCU",
+    "ESP32",
+    "CAN bus",
+    "FreeRTOS",
+    "Vehicle Telematics",
   ],
   authors: [{ name: site.name, url: site.linkedin }],
   creator: site.name,
   openGraph: {
     type: "website",
     locale: "en_IN",
-    title: `${site.name} — Embedded Software Engineer | EV Firmware`,
+    url: "/",
+    title,
     description,
-    siteName: `${site.name} Portfolio`,
+    siteName: `${site.name} — Engineering Portfolio`,
   },
-  twitter: {
-    card: "summary_large_image",
-    title: `${site.name} — Embedded Software Engineer | EV Firmware`,
-    description,
-  },
+  twitter: { card: "summary_large_image", title, description },
   robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#04060a",
+  themeColor: "#f4f5ef",
   width: "device-width",
   initialScale: 1,
 };
@@ -80,7 +67,7 @@ const jsonLd = {
   jobTitle: "Embedded Software Engineer",
   description,
   email: `mailto:${site.email}`,
-  url: "https://abhishek-agrahari.vercel.app",
+  url: siteUrl,
   sameAs: [site.linkedin, site.github],
   address: {
     "@type": "PostalAddress",
@@ -92,13 +79,11 @@ const jsonLd = {
     "Embedded Systems",
     "Electric Vehicles",
     "CAN Bus",
-    "Battery Management Systems",
     "STM32",
     "ESP32",
     "TI Microcontrollers",
     "FreeRTOS",
     "Vehicle Telematics",
-    "AIS-140",
   ],
   alumniOf: {
     "@type": "CollegeOrUniversity",
@@ -110,11 +95,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${space.variable} ${inter.variable} ${jet.variable}`}>
+    <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
       <body className="antialiased">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          }}
         />
         {children}
       </body>

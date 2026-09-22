@@ -1,81 +1,68 @@
-# Abhishek Agrahari — Portfolio
+# Abhishek Agrahari — Engineering Portfolio
 
-Personal portfolio for an Embedded Software Engineer / EV firmware consultant.
-The hero leads with a 3D portrait composition (AI-matted photo, parallax HUD readouts, a procedural
-vehicle-intelligence PCB behind it), followed by a live simulated BMS/CAN panel, a layered firmware-stack
-diagram, experience timeline, case-study projects and credentials.
+A portfolio for embedded software and EV firmware roles, focused on practical engineering contributions, vehicle connectivity and product development.
 
-**Stack:** Next.js 15 (App Router) · React 19 · React Three Fiber + drei + postprocessing · Tailwind CSS v4 · Framer Motion · Lenis · TypeScript
+Built with **Next.js 15, React 19, TypeScript and Tailwind CSS 4**, with custom CSS and bundled Geist fonts. The interface uses native scrolling and lightweight SVG graphics. It includes an interactive conceptual EV architecture diagram, four curated case studies with filters and detail dialogs, technical capabilities, career history and contact links.
 
----
-
-## Run locally
+## Run and verify
 
 ```bash
 npm install
-npm run dev        # → http://localhost:3000
-npm run build      # production build check
+npm run dev
 ```
 
-## Edit content
+Open `http://localhost:3000`.
 
-**Everything on the page comes from one file: [`src/data/site.ts`](src/data/site.ts)** — roles, hero copy, metrics,
-experience, projects, the firmware-stack layers, services, credentials, links.
+```bash
+npm run typecheck
+npm run lint
+npm run build
+npm run start
+```
 
-To add a project, copy one of the objects in `projects` and fill in `problem` / `build` / `impact` — that is what the
-case-study modal renders. Set `domain` to `"EV"`, `"IoT"`, `"Medical"` or `"Industrial"` for the filter.
+`typecheck` and `lint` both run TypeScript validation. `start` serves the production build.
 
-## Résumé (PDF)
+## Update content
 
-The résumé is generated from HTML so it stays one page, keeps a real text layer for ATS scanners, and matches the site.
-
-1. Edit [`tools/resume/resume.html`](tools/resume/resume.html)
-2. `npm run resume` → writes `public/Abhishek_Agrahari_Resume.pdf` and fails if it no longer fits one A4 page
-
-Needs Microsoft Edge installed (or `EDGE_PATH=<chromium binary>`).
-
-## Photo
-
-`tools/photo/source.jpg` is the original. `python tools/photo/enhance.py` regenerates:
-
-| Output | Used for |
+| File | Purpose |
 | --- | --- |
-| `public/profile-cutout.webp` | Hero 3D portrait (background removed by rembg, alpha tightened) |
-| `public/profile.jpg` | Enhanced photo with backdrop, for social cards / future use |
-| `tools/resume/photo.jpg` | Résumé headshot crop |
+| `src/data/portfolio.ts` | Selected work, career history, capabilities and current development focus |
+| `src/data/site.ts` | Identity, contact links, photo and résumé paths |
+| `src/app/page.tsx` | Page composition |
+| `src/app/globals.css` | Layout, visual styling and responsive behavior |
+| `src/components/portfolio/` | Navigation, EV diagram, case-study interactions and supporting components |
+| `src/app/layout.tsx` | Metadata, local fonts and Person structured data |
+| `src/app/opengraph-image.tsx` | Social preview image |
 
-Python needs `pillow numpy rembg onnxruntime`. On Windows, install them into a venv at a **short path**
-(e.g. `C:\pv`) — onnxruntime's files exceed the 260-character path limit inside deep folders.
-A higher-resolution source photo (the current one is a 400 px LinkedIn export) will noticeably improve the hero.
+Case studies describe project context, individual contributions and outcomes. They are engineering overviews, not proprietary source releases. The EV diagram illustrates a conceptual architecture; it does not display live vehicle telemetry. Performance metrics are omitted from the public presentation pending corroboration.
 
-## Deploy to Vercel (free)
+Geist and Geist Mono are served from `public/fonts/`; no Google Fonts download is needed to build or display the site. The page has no WebGL scene or loading gate.
 
-1. Push to GitHub (wired to `https://github.com/Abhishek-ESE/Portfolio`).
-2. [vercel.com/new](https://vercel.com/new) → **Import** the `Portfolio` repo → **Deploy** with defaults.
-3. Every push to `main` redeploys.
+## Résumé and photo
 
-After the first deploy, put the real URL in three places so social cards and SEO point at it:
-`src/app/layout.tsx` (`metadataBase`, `jsonLd.url`), `src/app/robots.ts` (`BASE`), `src/app/sitemap.ts` (`BASE`).
+The résumé link serves `public/Abhishek_Agrahari_Resume.pdf`. Its existing generation workflow is unchanged:
 
-## Project layout
+1. Edit `tools/resume/resume.html`.
+2. Run `npm run resume` to regenerate the PDF.
 
-```
-src/
-├─ app/                 layout (fonts, metadata, JSON-LD), page (section order), globals.css, icon, OG image, robots, sitemap
-├─ components/
-│  ├─ three/            HeroScene (camera rig, bloom), EcuModule (the PCB), Starfield, SceneMount (mounts only while visible)
-│  ├─ sections/         Nav, Hero (3D portrait), About (live VIM panel), Expertise (stack diagram), Experience, Projects, Credentials, Contact, Chrome
-│  ├─ ui/Primitives     Reveal, SectionHeading (watermark numeral), Tag, Panel, Section
-│  ├─ Preloader         firmware-style boot screen, once per session
-│  └─ SmoothScroll      Lenis
-├─ data/site.ts         ← all content
-tools/
-├─ resume/              resume.html + build.js (→ public/…Resume.pdf)
-└─ photo/               enhance.py + source.jpg (→ public/profile*.{jpg,webp})
+The generator requires Microsoft Edge, or a Chromium binary supplied through `EDGE_PATH`. Review the generated PDF before publishing it. Update photo assets in `public/` and their paths in `src/data/site.ts`.
+
+## Deploy to Vercel
+
+Authenticate, link the repository to the intended Vercel project, and deploy:
+
+```bash
+npx vercel login
+npx vercel link
+npx vercel --prod
 ```
 
-## Notes
+Set `NEXT_PUBLIC_SITE_URL` in the Vercel project's production environment to the final HTTPS domain, then redeploy if the domain was assigned after the first build. For a local production build, the same variable can be set in `.env.local`:
 
-- The WebGL canvas mounts only while the hero is on screen and unmounts when scrolled away.
-- Respects `prefers-reduced-motion`: single-frame scene, no smooth scroll, no preloader.
-- No external 3D assets — the module is procedural geometry, nothing to load and nothing to break.
+```dotenv
+NEXT_PUBLIC_SITE_URL=https://your-portfolio-domain.example
+```
+
+The shared URL helper in `src/data/site-url.ts` supplies the canonical URL, structured data, Open Graph URL, robots sitemap reference and sitemap entries. Replace the example with the real domain; the repository fallback does not confirm that a deployment exists.
+
+After deployment, check the page on desktop and mobile, open a case study, test the résumé and contact links, and verify `/robots.txt`, `/sitemap.xml` and the social preview.
